@@ -34,7 +34,7 @@ class AQXPublisher (AQXBase):
              *,
              mandatory=False,
              correlation_id=None,
-             headers: object=None,
+             headers: object = None,
              exchange: Stringable = None,
              serializer: Serializer = None) -> None:
 
@@ -83,6 +83,7 @@ class AQXPublisher (AQXBase):
                                               exchange_type='topic',
                                               durable=True)
                 # Retry now that the exchange is declared
-                self._publish(exchange, routing_key, properties, mandatory, data)
+                self._publish(exchange, routing_key,
+                              properties, mandatory, data)
             else:
                 raise

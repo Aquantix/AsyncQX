@@ -10,6 +10,6 @@ class Publisher(Protocol):
              payload: object,
              *,
              correlation_id=None,
-             headers: Dict=None,
+             headers: Dict = None,
              exchange: Stringable = None,
              serializer: Serializer = None) -> None: ...

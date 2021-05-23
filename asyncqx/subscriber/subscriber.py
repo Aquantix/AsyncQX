@@ -28,7 +28,7 @@ class AQXSubscriber (AQXBase):
     RETRY_JITTER = AQXBase.RETRY_JITTER
 
     def __init__(self,
-                 amqp_url: str=None,
+                 amqp_url: str = None,
                  *,
                  default_serializer=None,
                  default_exchange=None,
