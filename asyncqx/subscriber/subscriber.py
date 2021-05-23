@@ -167,6 +167,9 @@ class AQXSubscriber (AQXBase):
             auto_delete=exclusive)
 
     def _add_late_binding(self, exchange, queue_name, events, exclusive, callback):
+        exchange = str(exchange)
+        queue_name = str(queue_name)
+
         binding_key = (exchange, queue_name)
         self._late_bindings.setdefault(binding_key, [])
         self._late_bindings[binding_key].append(
