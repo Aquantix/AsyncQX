@@ -7,5 +7,6 @@ with open('requirements.txt') as fh:
 setup(
     name="asyncqx",
     packages=find_packages(),
+    python_requires=">=3.8",
     install_requires=requirements
 )
