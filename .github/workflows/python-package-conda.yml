@@ -32,7 +32,7 @@ jobs:
       run: |
         conda install pytest
         pip install -r test-requirements.txt
-        apt-get install rabbitmq-server
+        sudo apt-get install rabbitmq-server
 
         pytest
 
