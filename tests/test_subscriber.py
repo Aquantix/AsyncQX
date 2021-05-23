@@ -1,6 +1,4 @@
 from pika.spec import BasicProperties
-from asyncqx.subscriber.subscriber import EventBinding
-import pika.exceptions
 import pytest
 
 from asyncqx.subscriber import AQXSubscriber
@@ -40,6 +38,7 @@ def test_wrapping_function(subscriber):
     
     mock_fn.assert_called_once_with('some.event', { 'hello': 'world' }, props)
 
+
 def test_wrapping_function_isolates_errors(subscriber):
     mock_fn = mock.MagicMock()
     mock_fn.side_effect = Exception('some exception')
@@ -54,3 +53,15 @@ def test_wrapping_function_isolates_errors(subscriber):
             None, None, props, json.dumps({'hello': 'world'}))
     except Exception:
         pytest.fail("Side effect was propagated")
+
+
+def test_when_multiple_bindings_exist_for_same_queue_a_switch_function_is_created(subscriber):
+    mock_fn = mock.MagicMock()
+
+    subscriber.bind('some.event')(mock_fn)
+    subscriber.bind('some.other')(mock_fn)
+
+    with mock.patch.object(subscriber, '_channel'):
+        with mock.patch('asyncqx.subscriber.subscriber.create_event_switch') as mock_create_event_switch:
+            subscriber._apply_late_bindings()
+            mock_create_event_switch.assert_called_once()
