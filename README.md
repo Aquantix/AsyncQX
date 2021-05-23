@@ -1,6 +1,6 @@
 # AsyncQX - Asynchronous Queue eXtension
 
-TODO
+A publisher-subscriber implementation based on RabbitMQ.
 
 ## Testing
 
