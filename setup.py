@@ -5,7 +5,7 @@ with open('requirements.txt') as fh:
 
 setup(
     name="asyncqx",
-    version="1.0.0",
+    version="1.1.0",
     author="Drew Wagner",
     author_email="drew.wagner@aquantix.ai",
     description="A publisher-subscriber implementation backed by RabbitMQ",

@@ -13,14 +13,18 @@ class AQXPubSub:
                  *,
                  default_exchange: Stringable = None,
                  default_serializer: Serializer = None,
-                 default_queue: Stringable = None):
+                 default_queue: Stringable = None,
+                 default_exclusive = False):
         self.publisher = AQXPublisher(
             name, amqp_url, default_exchange=default_exchange,
             default_serializer=default_serializer)
 
         self.subscriber = AQXSubscriber(
-            amqp_url, default_exchange=default_exchange,
-            default_serializer=default_serializer, default_queue=default_queue)
+            amqp_url,
+            default_exchange=default_exchange,
+            default_serializer=default_serializer,
+            default_queue=default_queue,
+            default_exclusive=default_exclusive)
 
     def emit(self,
              event: Stringable,

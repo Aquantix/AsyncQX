@@ -33,12 +33,14 @@ class AQXSubscriber (AQXBase):
                  *,
                  default_serializer=None,
                  default_exchange=None,
-                 default_queue=None):
+                 default_queue=None,
+                 default_exclusive=False):
         super().__init__(amqp_url=amqp_url)
 
         self.default_serializer = default_serializer or JSONSerializer()
         self.default_exchange = default_exchange or 'asyncqx'
         self.default_queue = default_queue or ''
+        self.default_exclusive = default_exclusive
 
         self._late_bindings: Dict[Tuple[Stringable,
                                         Stringable], List[EventBinding]] = {}
@@ -47,7 +49,7 @@ class AQXSubscriber (AQXBase):
              *events: Stringable,
              queue_name: Stringable = None,
              exchange: Stringable = None,
-             exclusive: bool = False,
+             exclusive: bool = None,
              serializer: Serializer = None):
         """Create a decorate to bind callbacks to one or more events.
 
@@ -64,6 +66,7 @@ class AQXSubscriber (AQXBase):
         exchange = exchange or self.default_exchange
         serializer = serializer or self.default_serializer
         queue_name = queue_name or self.default_queue
+        exclusive = exclusive if exclusive is not None else self.default_exclusive
 
         def decorator(callback: EventListener):
             """Binds an EventListener callback to the specified events and queue.
