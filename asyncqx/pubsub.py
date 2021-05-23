@@ -1,10 +1,12 @@
-from asyncqx.subscriber.subscriber import AQXSubscriber
+"""Combines the publisher and subscriber classes into a single interface"""
+
 from asyncqx.core.types import Serializer, Stringable
 from asyncqx.publisher.publisher import AQXPublisher
+from asyncqx.subscriber.subscriber import AQXSubscriber
 
 
 class AQXPubSub:
-
+    """Provides the publishe and subscriber interfaces on a single object"""
     def __init__(self,
                  name,
                  amqp_url: str = None,

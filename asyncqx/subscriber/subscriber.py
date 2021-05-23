@@ -6,10 +6,11 @@ from typing import Callable, Dict, Iterable, List, Tuple
 
 import pika
 import pika.exceptions
+from retry import retry
+
 from asyncqx.core.base import AQXBase, JSONSerializer
 from asyncqx.core.types import EventListener, Serializer, Stringable
 from asyncqx.tools import amqp_match
-from retry import retry
 
 LOGGER = logging.getLogger(__name__)
 

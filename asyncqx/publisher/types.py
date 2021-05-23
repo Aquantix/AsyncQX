@@ -1,5 +1,6 @@
-from asyncqx.core.types import Serializer, Stringable
 from typing import Dict, Protocol, runtime_checkable
+
+from asyncqx.core.types import Serializer, Stringable
 
 
 @runtime_checkable

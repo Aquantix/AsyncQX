@@ -1,12 +1,12 @@
-import json
 import logging
 import time
 
 import pika
 import pika.exceptions
+from retry import retry
+
 from asyncqx.core.base import AQXBase, JSONSerializer
 from asyncqx.core.types import Serializer, Stringable
-from retry import retry
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +60,9 @@ class AQXPublisher (AQXBase):
                       data=data)
 
     @retry(pika.exceptions.AMQPConnectionError, tries=MAX_TRIES, delay=RETRY_DELAY, logger=LOGGER)
-    def _publish(self, exchange: str, routing_key: str, properties: pika.BasicProperties, mandatory: bool, data: bytes):
+    def _publish(self, exchange: str, routing_key: str,
+                 properties: pika.BasicProperties,
+                 mandatory: bool, data: bytes):
         self._ensure_channel()
 
         try:
