@@ -1,3 +1,4 @@
+import pika.exceptions
 import pytest
 
 from asyncqx.publisher import AQXPublisher
@@ -17,13 +18,6 @@ def test_publisher_can_connect(publisher):
     assert publisher.connection.is_open
 
 
-def test_get_jwt(publisher):
-    jwt = { 'sub': 'test' }
-    publisher.jwt = jwt
-
-    assert publisher.get_jwt() == jwt
-
-
 def test_pub_can_emit_message(publisher: AQXPublisher):
     publisher.emit(
         'event.test',
@@ -39,3 +33,14 @@ def test_pub_reestablishes_connection(publisher: AQXPublisher):
         {
             'hello': 'world'
         })
+
+
+def test_mandatory_emit_fails_when_no_consumer(publisher: AQXPublisher):
+    with pytest.raises(pika.exceptions.UnroutableError):
+        publisher.emit(
+            'event.test',
+            {
+                'hello': 'world'
+            },
+            mandatory=True
+        )

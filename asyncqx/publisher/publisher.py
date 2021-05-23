@@ -32,7 +32,9 @@ class AQXPublisher (AQXBase):
              event: Stringable,
              payload: object,
              *,
+             mandatory=False,
              correlation_id=None,
+             headers: object=None,
              exchange: Stringable = None,
              serializer: Serializer = None) -> None:
 
@@ -45,7 +47,8 @@ class AQXPublisher (AQXBase):
             app_id=self.name,
             type=str(event),
             timestamp=int(time.time()),
-            headers=
+            headers=headers,
+            delivery_mode=2 if mandatory else 1,
             correlation_id=str(correlation_id) if correlation_id else None)
 
         data = serializer.encode(payload)
@@ -53,23 +56,33 @@ class AQXPublisher (AQXBase):
         self._publish(str(exchange),
                       routing_key=str(event),
                       properties=props,
+                      mandatory=mandatory,
                       data=data)
 
     @retry(pika.exceptions.AMQPConnectionError, tries=MAX_TRIES, delay=RETRY_DELAY, logger=LOGGER)
-    def _publish(self, exchange: str, routing_key: str, properties: pika.BasicProperties, data: bytes):
+    def _publish(self, exchange: str, routing_key: str, properties: pika.BasicProperties, mandatory: bool, data: bytes):
         self._ensure_channel()
-
-        self.channel.exchange_declare(exchange,
-                                      exchange_type='topic',
-                                      durable=True)
 
         try:
             self._channel.basic_publish(
                 exchange=exchange,
                 routing_key=routing_key,
                 properties=properties,
+                mandatory=mandatory,
                 body=data)
 
         except pika.exceptions.UnroutableError as err:
-            LOGGER.debug('message was unroutable: %s', err)
-            pass
+            LOGGER.debug('message %s to exchange %s was unroutable: %s',
+                         routing_key, exchange, err)
+            if mandatory:
+                raise
+
+        except pika.exceptions.ChannelClosedByBroker as err:
+            if err.reply_code == 404:  # exchange not found
+                self.channel.exchange_declare(exchange,
+                                              exchange_type='topic',
+                                              durable=True)
+                # Retry now that the exchange is declared
+                self._publish(exchange, routing_key, properties, mandatory, data)
+            else:
+                raise
