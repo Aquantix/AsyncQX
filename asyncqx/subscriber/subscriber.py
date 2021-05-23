@@ -174,6 +174,8 @@ class AQXSubscriber (AQXBase):
         exchange = str(exchange)
         queue_name = str(queue_name)
 
+        events = tuple(str(event) for event in events)
+
         binding_key = (exchange, queue_name)
         self._late_bindings.setdefault(binding_key, [])
         self._late_bindings[binding_key].append(
