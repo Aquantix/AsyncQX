@@ -58,10 +58,21 @@ def test_wrapping_function_isolates_errors(subscriber):
 def test_when_multiple_bindings_exist_for_same_queue_a_switch_function_is_created(subscriber):
     mock_fn = mock.MagicMock()
 
-    subscriber.bind('some.event')(mock_fn)
-    subscriber.bind('some.other')(mock_fn)
+    subscriber.bind('some.event', queue_name='same_queue')(mock_fn)
+    subscriber.bind('some.other', queue_name='same_queue')(mock_fn)
 
     with mock.patch.object(subscriber, '_channel'):
         with mock.patch('asyncqx.subscriber.subscriber.create_event_switch') as mock_create_event_switch:
             subscriber._apply_late_bindings()
             mock_create_event_switch.assert_called_once()
+
+
+def test_functions_are_bound_to_queues_with_no_errors(subscriber):
+    mock_fn = mock.MagicMock()
+
+    subscriber.bind('some.event', queue_name='same_queue')(mock_fn)
+    subscriber.bind('some.other', queue_name='same_queue')(mock_fn)
+
+    subscriber._ensure_channel()
+    subscriber._apply_late_bindings()
+    subscriber.close()
