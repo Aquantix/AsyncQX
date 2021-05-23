@@ -4,6 +4,7 @@ import traceback
 from dataclasses import dataclass
 from typing import Callable, Dict, Iterable, List, Tuple
 
+import pika
 import pika.exceptions
 from asyncqx.core.base import AQXBase, JSONSerializer
 from asyncqx.core.types import EventListener, Serializer, Stringable
@@ -187,11 +188,12 @@ def create_event_switch(event_bindings: Iterable[EventBinding]) -> Callable:
     Returns:
         Callable: [description]
     """
-    def switch(ch, method, props, body):
+    def switch(ch, method, props: pika.BasicProperties, body):
         event = props.type
+        assert event is not None
 
         for event_binding in event_bindings:
-            if any(amqp_match(event, str(pattern)) for pattern in event_binding.events):
+            if any(amqp_match(str(event), str(pattern)) for pattern in event_binding.events):
                 try:
                     event_binding.callback(ch, method, props, body)
                 except Exception as err:
